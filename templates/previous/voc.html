@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text to Speech with Azure</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("textForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+            });
+        });
+
+        async function getMeaning() {
+            let text = document.getElementsByName("text_to_speak")[0].value;
+            let response = await fetch('/get_meaning', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `text_to_speak=${text}`
+            });
+            let data = await response.json();
+            document.getElementById("meaningOutput").innerText = data.meaning;
+        }
+
+        async function speakText() {
+            let text = document.getElementsByName("text_to_speak")[0].value;
+            // console.log("Sending text:", text); // テキストの確認
+
+            let response = await fetch('/speak', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `text=${text}`
+            });
+
+            // サーバーからのレスポンスを確認
+            // let data = await response.json();
+            // console.log("Server response:", data);
+        }
+        async function saveToCSV() {
+    let text = document.getElementsByName("text_to_speak")[0].value;
+
+    let response = await fetch('/save_to_csv', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `text=${text}`
+    });
+
+    let data = await response.json();
+    console.log("Server response:", data.message);
+}
+async function teachWord() {
+    let text = document.getElementsByName("text_to_speak")[0].value;
+
+    let response = await fetch('/teach_word', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `text=${text}`
+    });
+
+    let data = await response.json();
+    console.log("Server response:", data.message);
+    document.getElementById("meaningOutput").innerText = data.message;  // AIの応答を出力領域に表示
+}
+
+    </script>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100%;
+        }
+        form {
+            text-align: center;
+            margin-top: 50px;
+        }
+        textarea {
+            width: 900px;
+            height: 100px;
+            font-size: 38px;
+        }
+        input[type="submit"], button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .output-box {
+            width: 900px;
+            border: 1px solid white;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        #meaningOutput {
+            font-size: 32px;  /* 文字の大きさを倍に */
+            word-wrap: break-word;  /* 折り返しを許可 */
+        }
+        .btn { /* 新しい共通のスタイルクラス */
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form id="textForm">
+            <textarea name="text_to_speak"></textarea><br><br>
+            <input type="button" class="btn" value="Speak" onclick="speakText()">
+            <button type="button" class="btn" onclick="getMeaning()">Get Meaning</button>
+            <input type="button" class="btn" value="Save to CSV" onclick="saveToCSV()">
+            <input type="button" class="btn" value="Teach Word" onclick="teachWord()">
+            <input type="button" class="btn" value="Go to Random Word Page" onclick="window.location.href='/random_word_page'">
+        </form>
+        <div class="output-box">
+            <p id="meaningOutput"></p>
+        </div>
+    </div>
+</body>
+
+</html>

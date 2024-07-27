@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Random Word from CSV</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100%;
+        }
+        button {
+            margin-top: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .output-box {
+            width: 900px;
+            border: 1px solid white;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 32px;
+            word-wrap: break-word;
+        }
+.button-container {
+    display: flex;
+    justify-content: center;  /* 中央揃え */
+    gap: 20px;  /* ボタン同士の間隔 */
+}
+.success-btn, .fail-btn {
+    font-size: 18px;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: 0.3s;
+    margin: 5px;
+}
+
+.success-btn {
+    background-color: green;
+    color: white;
+    box-shadow: 0 5px #006400; /* ボタンの下の影 */
+}
+
+.success-btn:hover {
+    background-color: #008000; /* ホバー時の背景色 */
+    box-shadow: 0 3px #006400;
+    transform: translateY(2px);
+}
+
+.fail-btn {
+    background-color: red;
+    color: white;
+    box-shadow: 0 5px #8B0000; /* ボタンの下の影 */
+}
+
+.fail-btn:hover {
+    background-color: #B22222; /* ホバー時の背景色 */
+    box-shadow: 0 3px #8B0000;
+    transform: translateY(2px);
+}
+#randomWordOutput {
+    color: black;  /* この行を追加 */
+}
+
+    </style>
+ <script>
+    let currentWord = "";  // ランダムワードを保持する変数を追加
+
+    async function getRandomWord() {
+        let response = await fetch('/get_random_word');
+        let data = await response.json();
+        currentWord = data.word;  // 取得したランダムワードを変数にセット
+        document.getElementById("randomWordOutput").innerText = currentWord;  // 現在のランダムワードを表示
+    }
+
+    async function playRandomWord() {
+    let response = await fetch('/get_random_word_audio');
+    let data = await response.json();
+    currentWord = data.word;
+    document.getElementById("randomWordOutput").innerText = data.word;
+    // 音声はサーバー側で直接再生されるので、ここでは何も行いません
+}
+
+    async function logResult(result) {
+        if(currentWord === "") {
+            console.error("No word to log!");
+            return;
+        }
+        let response = await fetch('/log_result', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `word=${currentWord}&result=${result}`
+        });
+
+        let data = await response.json();
+        console.log("Server response:", data.message);
+    }
+</script>
+</head>
+
+<body>
+    <div class="container">
+        <button class="btn" onclick="playRandomWord()">Get Random Word</button>
+        <div class="output-box">
+            <p id="randomWordOutput"></p>
+        </div>
+        <div class="button-container">
+        <button class="success-btn" onclick="logResult('success')">Success</button>
+        <button class="fail-btn" onclick="logResult('fail')">Fail</button>
+            </div>
+        <button onclick="location.href='/'">Back to voc.html</button>
+    </div>
+</body>
+
+</html>
