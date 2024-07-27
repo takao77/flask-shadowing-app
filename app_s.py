@@ -3,13 +3,18 @@ import requests
 import base64
 from pydub import AudioSegment
 from io import BytesIO
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
-# Replace these with your actual API key and endpoint
-AZURE_API_KEY = '7f08d064b12e4b3b897eb343f5334d51'
-AZURE_TTS_ENDPOINT = 'https://eastus.api.cognitive.microsoft.com/sts/v1.0/issuetoken'
-AZURE_TTS_API_URL = 'https://eastus.tts.speech.microsoft.com/cognitiveservices/v1'
+# Retrieve API key and endpoints from environment variables
+AZURE_API_KEY = os.getenv('AZURE_API_KEY')
+AZURE_TTS_ENDPOINT = os.getenv('AZURE_TTS_ENDPOINT')
+AZURE_TTS_API_URL = os.getenv('AZURE_TTS_API_URL')
 
 
 def get_access_token():
